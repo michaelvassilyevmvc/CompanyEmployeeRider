@@ -1,4 +1,6 @@
+using CompanyEmployees;
 using CompanyEmployees.Extensions;
+using Contracts;
 using Microsoft.AspNetCore.HttpOverrides;
 using NLog;
 
@@ -17,13 +19,16 @@ builder.Services.ConfigureSqlContext(builder.Configuration);
 builder.Services.AddControllers()
     .AddApplicationPart(typeof(CompanyEmployees.Presentation.AssemblyReference).Assembly); // чтобы можно было брать контроллеры из другого проекта
 builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 var app = builder.Build();
-if (app.Environment.IsDevelopment())
-{
-    app.UseDeveloperExceptionPage();
-}
-else
+
+// Альтернативный вариант без исопльзования builder.Services.AddExceptionHandler
+// var logger = app.Services.GetRequiredService<ILoggerManager>();
+// app.ConfigureExceptionHandler(logger);
+
+app.UseExceptionHandler(opt => {});
+if (app.Environment.IsProduction())
 {
     app.UseHsts();
 }
